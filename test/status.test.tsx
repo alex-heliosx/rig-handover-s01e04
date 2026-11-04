@@ -11,6 +11,7 @@ describe('status board', () => {
     expect(res.status).toBe(200);
     expect(html).toContain('TEST-MARKER');
     expect(html).toContain('2026-10-28');
+    expect(html).toContain('href="/digest/2026-10-28"');
   });
 
   it('digest page smoke: renders a night, 404s on a bad one', async () => {
