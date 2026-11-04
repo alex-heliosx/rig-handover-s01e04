@@ -1,0 +1,35 @@
+# Preview for review (plan § 3, ADR 0003): save /digest/<night> as one HTML file and put it on
+# GitHub Pages from a build artifact, so no preview is ever committed. The lane marker comes from
+# the repository variable LANE_MARKER; clear that variable and run again to take the marker off (§ 4).
+name: preview
+on:
+  workflow_dispatch:
+    inputs:
+      night:
+        description: night to preview (YYYY-MM-DD)
+        default: "2026-10-28"
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
+    env:
+      LANE_ID: lane-07
+      LANE_MARKER: ${{ vars.LANE_MARKER }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: scripts/save-page.sh "/digest/${{ inputs.night }}" out/index.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: out }
+      - id: deploy
+        uses: actions/deploy-pages@v4
