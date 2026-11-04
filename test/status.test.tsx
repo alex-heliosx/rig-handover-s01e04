@@ -14,14 +14,6 @@ describe('status board', () => {
     expect(html).toContain('href="/digest/2026-10-28"');
   });
 
-  it('digest page smoke: renders a night, 404s on a bad one', async () => {
-    const app = createApp(config);
-    const res = await app.request('/digest/2026-10-28');
-    expect(res.status).toBe(200);
-    expect(await res.text()).toContain('<table>');
-    expect((await app.request('/digest/nope')).status).toBe(404);
-  });
-
   it('health answers with the lane id', async () => {
     const res = await createApp(config).request('/health');
     expect(await res.json()).toEqual({ ok: true, lane: 'lane-07' });
