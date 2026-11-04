@@ -33,5 +33,12 @@ export function createApp(config: RigConfig = loadConfig()) {
     );
   });
 
+  // Same reader as the digest page, no transformation: they must never disagree (ADR 0001).
+  app.get('/api/digest/:night', (c) => {
+    const night = c.req.param('night');
+    const digest = NIGHT.test(night) ? readNight(config.runsDir, night) : null;
+    return digest ? c.json(digest) : c.json({ error: 'no such night' }, 404);
+  });
+
   return app;
 }
